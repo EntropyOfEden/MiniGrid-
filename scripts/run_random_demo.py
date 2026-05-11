@@ -13,12 +13,12 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.env_setup import make_minigrid_env
+from src.env_setup import DEFAULT_ENV_ID, make_minigrid_env
 
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--env-id", type=str, default="MiniGrid-Empty-8x8-v0")
+    p.add_argument("--env-id", type=str, default=DEFAULT_ENV_ID)
     p.add_argument("--steps", type=int, default=200)
     args = p.parse_args()
 

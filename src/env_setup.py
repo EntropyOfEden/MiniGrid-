@@ -7,6 +7,8 @@ from gymnasium import ObservationWrapper, RewardWrapper
 import numpy as np
 from minigrid.wrappers import FullyObsWrapper, ImgObsWrapper
 
+DEFAULT_ENV_ID = "MiniGrid-ObstructedMaze-2Q-v1"
+
 
 class StepPenaltyRewardWrapper(RewardWrapper):
     """Small per-step penalty plus goal bonus (sparse MiniGrid reward stays)."""
@@ -28,7 +30,7 @@ class ImageFloatCHW(ObservationWrapper):
 
 
 def make_minigrid_env(
-    env_id: str = "MiniGrid-Empty-8x8-v0",
+    env_id: str = DEFAULT_ENV_ID,
     fully_observable: bool = True,
     step_penalty: float | None = -0.001,
     render_mode: str | None = None,

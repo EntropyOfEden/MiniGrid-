@@ -11,7 +11,7 @@ import numpy as np
 import torch
 
 from src.dqn_agent import DQNAgent
-from src.env_setup import make_minigrid_env
+from src.env_setup import DEFAULT_ENV_ID, make_minigrid_env
 
 
 def epsilon_by_step(step: int, eps_start: float, eps_end: float, eps_decay_steps: int) -> float:
@@ -123,22 +123,22 @@ def train(args):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--env-id", type=str, default="MiniGrid-Empty-8x8-v0")
-    p.add_argument("--episodes", type=int, default=400)
-    p.add_argument("--max-steps", type=int, default=200_000)
-    p.add_argument("--gamma", type=float, default=0.99)
-    p.add_argument("--lr", type=float, default=1e-4)
-    p.add_argument("--batch-size", type=int, default=128)
-    p.add_argument("--replay-capacity", type=int, default=80_000)
-    p.add_argument("--target-update-every", type=int, default=1000)
-    p.add_argument("--eps-start", type=float, default=1.0)
-    p.add_argument("--eps-end", type=float, default=0.05)
-    p.add_argument("--eps-decay-steps", type=int, default=80_000)
-    p.add_argument("--step-penalty", type=float, default=-0.001)
-    p.add_argument("--double-dqn", action="store_true")
-    p.add_argument("--cpu", action="store_true")
-    p.add_argument("--output-dir", type=str, default="runs/default")
-    p.add_argument("--log-every", type=int, default=10)
+    p.add_argument("--env-id", type=str, default=DEFAULT_ENV_ID)  # Gymnasium 注册的 MiniGrid 环境ID
+    p.add_argument("--episodes", type=int, default=400)  # 最多训练的回合数；若先达到 --max-steps 会提前结束
+    p.add_argument("--max-steps", type=int, default=200_000)  # 与环境交互的总步数上限，所有回合累计
+    p.add_argument("--gamma", type=float, default=0.99)  # 折扣因子 γ，越大越重视长期回报
+    p.add_argument("--lr", type=float, default=1e-4)  # Adam 优化器学习率
+    p.add_argument("--batch-size", type=int, default=128)  # 每次梯度更新从回放池采样的转移条数
+    p.add_argument("--replay-capacity", type=int, default=80_000)  # 经验回放缓冲区最大容量
+    p.add_argument("--target-update-every", type=int, default=1000)  # 每隔多少环境步同步目标网络
+    p.add_argument("--eps-start", type=float, default=1.0)  # ε- 贪婪初值，1 表示完全随机试探
+    p.add_argument("--eps-end", type=float, default=0.05)  # ε 衰减到的下限
+    p.add_argument("--eps-decay-steps", type=int, default=80_000)  # ε线性衰减所用的环境步数，非回合数
+    p.add_argument("--step-penalty", type=float, default=-0.001)  # 每步外加奖励，整形，多为小额负数
+    p.add_argument("--double-dqn", action="store_true")  # 启用 Double DQN，减轻 Q 值过估计
+    p.add_argument("--cpu", action="store_true")  # 强制 CPU，无视 CUDA
+    p.add_argument("--output-dir", type=str, default="runs/default")  # metrics.jsonl 与 agent.pt 输出目录
+    p.add_argument("--log-every", type=int, default=10)  # 每隔多少个 episode 打印日志
     args = p.parse_args()
 
     train(args)

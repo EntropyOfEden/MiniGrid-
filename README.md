@@ -25,7 +25,9 @@
 
 `python train.py --double-dqn --output-dir runs/exp2`
 
-常用参数：`--env-id MiniGrid-Empty-8x8-v0`、`--episodes`、`--max-steps`、`--eps-decay-steps`、`--step-penalty`。
+默认训练环境为 **`MiniGrid-ObstructedMaze-2Q-v1`**（门锁、钥匙与阻挡球的迷宫类任务，详见 MiniGrid 文档）。若要换回简单空房间可加上 `--env-id MiniGrid-Empty-8x8-v0`。该任务较难，若收敛慢可适当增大 `--max-steps`、`--episodes`。
+
+常用参数：`--env-id`、`--episodes`、`--max-steps`、`--eps-decay-steps`、`--step-penalty`。
 
 训练过程将写入 `metrics.jsonl`，并在结束时保存 `agent.pt`。
 
@@ -37,7 +39,7 @@
 
 默认预算会更长；额外参数会透传给 `train.py`，例如：
 
-`python scripts/compare_double_dqn.py --env-id MiniGrid-Empty-16x16-v0`
+`python scripts/compare_double_dqn.py --env-id MiniGrid-FourRooms-v0`
 
 对比结果图：`runs/compare_dqn_double.png`。
 
@@ -53,7 +55,7 @@
 
 | 路径 | 说明 |
 |------|------|
-| `src/env_setup.py` | MiniGrid 封装、全局可视图像观测、每步惩罚奖励整形 |
+| `src/env_setup.py` | `DEFAULT_ENV_ID`、MiniGrid 封装、全局可视图像观测、每步惩罚奖励整形 |
 | `src/networks.py` | 卷积 Q 网络 |
 | `src/replay_buffer.py` | 经验回放 |
 | `src/dqn_agent.py` | DQN / Double DQN 更新逻辑 |

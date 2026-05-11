@@ -8,7 +8,7 @@ import argparse
 import numpy as np
 import torch
 
-from src.env_setup import make_minigrid_env
+from src.env_setup import DEFAULT_ENV_ID, make_minigrid_env
 from src.networks import NatureCNN
 
 
@@ -24,7 +24,7 @@ def main():
         ckpt = torch.load(args.ckpt, map_location="cpu", weights_only=False)
     except TypeError:
         ckpt = torch.load(args.ckpt, map_location="cpu")
-    env_id = ckpt.get("env_id", "MiniGrid-Empty-8x8-v0")
+    env_id = ckpt.get("env_id", DEFAULT_ENV_ID)
     step_penalty = ckpt.get("step_penalty", -0.001)
     obs_shape = tuple(ckpt["obs_shape"])
     n_actions = int(ckpt["n_actions"])
