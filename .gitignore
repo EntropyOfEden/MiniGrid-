@@ -1,7 +1,5 @@
-runs/
 __pycache__/
-*.pt
 .venv/
-*.jsonl
 *.docx
 *.xlsx
+.vscode
