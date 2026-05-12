@@ -5,7 +5,7 @@ import copy
 import torch
 import torch.nn as nn
 
-from .networks import NatureCNN
+from .networks import MiniGridCNN
 from .replay_buffer import ReplayBuffer
 
 
@@ -25,14 +25,15 @@ class DQNAgent:
         self.n_actions = n_actions
         self.use_double_dqn = use_double_dqn
         c, h, w = obs_shape
-        self.policy_net = NatureCNN(c, n_actions).to(device)
+        self.policy_net = MiniGridCNN(c, n_actions).to(device)
         self.target_net = copy.deepcopy(self.policy_net).to(device)
         self.target_net.eval()
         self.optimizer = torch.optim.Adam(self.policy_net.parameters(), lr=lr)
         self.loss_fn = nn.SmoothL1Loss()
         self.buffer = ReplayBuffer(replay_capacity, obs_shape, n_actions, device)
 
-    def soft_copy_target(self):
+    def hard_update_target(self) -> None:
+        """Hard sync target ← online（与 SB3 `tau=1` 的 polyak 更新等价）。"""
         self.target_net.load_state_dict(self.policy_net.state_dict())
 
     def act_epsilon_greedy(self, obs, epsilon: float) -> int:
@@ -42,13 +43,13 @@ class DQNAgent:
             q = self.policy_net(obs.unsqueeze(0))
             return int(q.argmax(dim=1).item())
 
-    def push(self, obs, action, reward, next_obs, done):
-        self.buffer.push(obs, action, reward, next_obs, done)
+    def push(self, obs, action, reward, next_obs, terminated: bool):
+        self.buffer.push(obs, action, reward, next_obs, terminated)
 
     def learn(self, batch_size: int):
         if len(self.buffer) < batch_size:
             return None
-        obs, actions, rewards, next_obs, dones = self.buffer.sample(batch_size)
+        obs, actions, rewards, next_obs, terminals = self.buffer.sample(batch_size)
 
         with torch.no_grad():
             if self.use_double_dqn:
@@ -56,7 +57,7 @@ class DQNAgent:
                 next_q = self.target_net(next_obs).gather(1, next_actions).squeeze(1)
             else:
                 next_q = self.target_net(next_obs).max(dim=1).values
-            target = rewards + (1.0 - dones) * self.gamma * next_q
+            target = rewards + (1.0 - terminals) * self.gamma * next_q
 
         q = self.policy_net(obs).gather(1, actions.unsqueeze(1)).squeeze(1)
         loss = self.loss_fn(q, target)

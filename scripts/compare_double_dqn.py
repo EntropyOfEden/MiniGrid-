@@ -57,12 +57,16 @@ def main():
             "80",
             "--max-steps",
             "25000",
-            "--eps-decay-steps",
-            "15000",
-            "--replay-capacity",
-            "30000",
-            "--target-update-every",
+            "--learning-starts",
+            "100",
+            "--train-freq",
+            "4",
+            "--buffer-size",
+            "50000",
+            "--target-update-interval",
             "500",
+            "--exploration-fraction",
+            "0.5",
         ]
     else:
         common += ["--episodes", "350", "--max-steps", "180000"]
